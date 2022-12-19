@@ -6,7 +6,7 @@ class Cloud(pygame.sprite.Sprite):
     def __init__(self):
         super(Cloud, self).__init__()
         image = pygame.image.load("cloud.png")
-        self.surf = pygame.transform.scale(image, (75, 75))
+        self.surf = pygame.transform.scale(image, (75, 30))
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         # The starting position is randomly generated
         self.rect = self.surf.get_rect(
@@ -127,8 +127,10 @@ def game_intro():
 # Press the green button in the gutter to run the script.
 def game_loop():
     global enemy_count
+    ENEMY_RATE = pygame.USEREVENT + 3
+    pygame.time.set_timer(ENEMY_RATE, 5000)
     ADDCLOUD = pygame.USEREVENT + 2
-    pygame.time.set_timer(ADDCLOUD, 750)
+    pygame.time.set_timer(ADDCLOUD, 600)
     ADDENEMY = pygame.USEREVENT + 1
     enemy_rate = 250
     pygame.time.set_timer(ADDENEMY, enemy_rate)
@@ -167,27 +169,26 @@ def game_loop():
                 new_cloud = Cloud()
                 clouds.add(new_cloud)
                 all_sprites.add(new_cloud)
+            elif event.type == ENEMY_RATE:
+                # Create the new cloud and add it to sprite groups
+                pygame.time.set_timer(ADDENEMY, enemy_rate)
 
         if enemy_count == 50:
             enemy_rate = 200
-            pygame.time.set_timer(ADDENEMY, enemy_rate)
             background_color = blue
         elif enemy_count == 100:
             enemy_rate = 150
-            pygame.time.set_timer(ADDENEMY, enemy_rate)
             background_color = green
         elif enemy_count == 150:
             enemy_rate = 100
-            pygame.time.set_timer(ADDENEMY, enemy_rate)
             background_color = red
         elif enemy_count == 200:
             enemy_rate = 50
-            pygame.time.set_timer(ADDENEMY, enemy_rate)
             background_color = black
         elif enemy_count == 250:
             enemy_rate = 25
-            pygame.time.set_timer(ADDENEMY, enemy_rate)
             background_color = white
+
 
 
 
