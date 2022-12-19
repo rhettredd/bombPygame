@@ -51,7 +51,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
         image = pygame.image.load("jet.png")
-        self.surf = pygame.transform.scale(image, (50,50))
+        self.surf = pygame.transform.scale(image, (50,30))
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect()
 
