@@ -143,7 +143,7 @@ def game_loop():
     start_time = pygame.time.get_ticks()
     # font = pygame.font.SysFont(None, 32)
     enemy_count = 0
-
+    background_color = sky_blue
     running = True
     while running:
 
@@ -171,12 +171,23 @@ def game_loop():
         if enemy_count == 50:
             enemy_rate = 200
             pygame.time.set_timer(ADDENEMY, enemy_rate)
+            background_color = blue
         elif enemy_count == 100:
             enemy_rate = 150
             pygame.time.set_timer(ADDENEMY, enemy_rate)
+            background_color = green
         elif enemy_count == 150:
             enemy_rate = 100
             pygame.time.set_timer(ADDENEMY, enemy_rate)
+            background_color = red
+        elif enemy_count == 200:
+            enemy_rate = 50
+            pygame.time.set_timer(ADDENEMY, enemy_rate)
+            background_color = black
+        elif enemy_count == 250:
+            enemy_rate = 25
+            pygame.time.set_timer(ADDENEMY, enemy_rate)
+            background_color = white
 
 
 
@@ -191,7 +202,7 @@ def game_loop():
         clouds.update()
 
         # Fill the background with white
-        screen.fill((135, 206, 250))
+        screen.fill(background_color)
 
         for entity in all_sprites:
             screen.blit(entity.surf, entity.rect)
@@ -248,6 +259,7 @@ white = (255,255,255)
 red = (255,0,0)
 green = (0,255,0)
 blue = (0,0,255)
+sky_blue = (135, 206, 250)
 
 pygame.init()
 
