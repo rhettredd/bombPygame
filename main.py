@@ -26,8 +26,8 @@ class Cloud(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super(Enemy, self).__init__()
-        image = pygame.image.load("bomb.png")
-        self.surf = pygame.transform.scale(image, (25, 25))
+        image = pygame.image.load("missile.png")
+        self.surf = pygame.transform.scale(image, (40, 30))
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center=(
@@ -43,6 +43,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.move_ip(-self.speed, 0)
         if self.rect.right < 0:
             self.kill()
+            global enemy_count
+            enemy_count += 1
 
 
 class Player(pygame.sprite.Sprite):
@@ -124,11 +126,12 @@ def game_intro():
 
 # Press the green button in the gutter to run the script.
 def game_loop():
-    ADDENEMY = pygame.USEREVENT + 1
-    pygame.time.set_timer(ADDENEMY, 250)
-
+    global enemy_count
     ADDCLOUD = pygame.USEREVENT + 2
-    pygame.time.set_timer(ADDCLOUD, 1000)
+    pygame.time.set_timer(ADDCLOUD, 750)
+    ADDENEMY = pygame.USEREVENT + 1
+    enemy_rate = 250
+    pygame.time.set_timer(ADDENEMY, enemy_rate)
 
     player = Player()
 
@@ -137,6 +140,10 @@ def game_loop():
     all_sprites = pygame.sprite.Group()
     all_sprites.add(player)
     # Run until the user asks to quit
+    start_time = pygame.time.get_ticks()
+    # font = pygame.font.SysFont(None, 32)
+    enemy_count = 0
+
     running = True
     while running:
 
@@ -161,6 +168,21 @@ def game_loop():
                 clouds.add(new_cloud)
                 all_sprites.add(new_cloud)
 
+        if enemy_count == 50:
+            enemy_rate = 200
+            pygame.time.set_timer(ADDENEMY, enemy_rate)
+        elif enemy_count == 100:
+            enemy_rate = 150
+            pygame.time.set_timer(ADDENEMY, enemy_rate)
+        elif enemy_count == 150:
+            enemy_rate = 100
+            pygame.time.set_timer(ADDENEMY, enemy_rate)
+
+
+
+
+
+
         pressed_keys = pygame.key.get_pressed()
         player.update(pressed_keys)
 
@@ -179,8 +201,26 @@ def game_loop():
             # If so, then remove the player and stop the loop
             player.kill()
             running = False
-        # screen.blit(player.surf, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
+
+        # counting_time = pygame.time.get_ticks() - start_time
+        #
+
+        # change milliseconds into minutes, seconds, milliseconds
+        # counting_minutes = str(counting_time / 60000).zfill(2)
+        # counting_seconds = str((counting_time % 60000) / 1000).zfill(2)
+        # counting_millisecond = str(counting_time % 1000).zfill(3)
+        #
+        # counting_string = "%s:%s:%s" % (counting_minutes, counting_seconds, counting_millisecond)
+        #
+        # counting_text = font.render(str(counting_string), 1, (255, 255, 255))
+        # counting_rect = counting_text.get_rect(50,50)
+
+        font = pygame.font.SysFont('Arial', 30)
+        score_str = 'Score: ' + str(enemy_count)
+        screen.blit(font.render(score_str, True, black), (0, 0, 200, 100))
+
         screen.blit(player.surf, player.rect)
+        # screen.blit(counting_text, counting_rect)
 
         pygame.display.flip()
         clock.tick(30)
@@ -223,6 +263,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 clock = pygame.time.Clock()
 
+enemy_count = 0
 done = False
 while not done:
     game_intro()
