@@ -6,12 +6,12 @@ class Cloud(pygame.sprite.Sprite):
     def __init__(self):
         super(Cloud, self).__init__()
         image = pygame.image.load("cloud.png")
-        self.surf = pygame.transform.scale(image, (75, 30))
+        self.surf = pygame.transform.scale(image, (SCREEN_WIDTH*0.1, SCREEN_HEIGHT*0.05))
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         # The starting position is randomly generated
         self.rect = self.surf.get_rect(
             center=(
-                random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),
+                SCREEN_WIDTH+200,
                 random.randint(0, SCREEN_HEIGHT),
             )
         )
@@ -19,7 +19,7 @@ class Cloud(pygame.sprite.Sprite):
     # Move the cloud based on a constant speed
     # Remove the cloud when it passes the left edge of the screen
     def update(self):
-        self.rect.move_ip(-5, 0)
+        self.rect.move_ip(-0.00625*SCREEN_WIDTH*SPEED_MODIFIER, 0)
         if self.rect.right < 0:
             self.kill()
 
@@ -27,7 +27,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super(Enemy, self).__init__()
         image = pygame.image.load("missile.png")
-        self.surf = pygame.transform.scale(image, (40, 30))
+        self.surf = pygame.transform.scale(image, (SCREEN_WIDTH*0.05, SCREEN_HEIGHT*0.05))
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center=(
@@ -35,12 +35,12 @@ class Enemy(pygame.sprite.Sprite):
                 random.randint(0, SCREEN_HEIGHT),
             )
         )
-        self.speed = random.randint(5, 20)
+        self.speed = random.randint(5, 20)*SPEED_MODIFIER
 
     # Move the sprite based on speed
     # Remove the sprite when it passes the left edge of the screen
     def update(self):
-        self.rect.move_ip(-self.speed, 0)
+        self.rect.move_ip(-self.speed*(SCREEN_WIDTH/800)*SPEED_MODIFIER, 0)
         if self.rect.right < 0:
             self.kill()
             global enemy_count
@@ -51,19 +51,19 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
         image = pygame.image.load("jet.png")
-        self.surf = pygame.transform.scale(image, (50,30))
+        self.surf = pygame.transform.scale(image, (SCREEN_HEIGHT*0.0625,SCREEN_HEIGHT*0.05))
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect()
 
     def update(self, pressed_keys):
         if pressed_keys[K_UP] or pressed_keys[K_w]:
-            self.rect.move_ip(0, -10)
+            self.rect.move_ip(0, -0.0125*SCREEN_WIDTH*SPEED_MODIFIER)
         if pressed_keys[K_DOWN] or pressed_keys[K_s]:
-            self.rect.move_ip(0, 10)
+            self.rect.move_ip(0, 0.0125*SCREEN_WIDTH*SPEED_MODIFIER)
         if pressed_keys[K_LEFT] or pressed_keys[K_a]:
-            self.rect.move_ip(-10, 0)
+            self.rect.move_ip(-0.0125*SCREEN_WIDTH*SPEED_MODIFIER, 0)
         if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
-            self.rect.move_ip(10, 0)
+            self.rect.move_ip(0.0125*SCREEN_WIDTH*SPEED_MODIFIER, 0)
 
         # Keep player on the screen
         if self.rect.left < 0:
@@ -81,6 +81,9 @@ def text_objects(text, font):
 
 def game_intro():
     intro = True
+    global screen
+    global SCREEN_HEIGHT
+    global SCREEN_WIDTH
     # button = pygame.Surface((200, 100))
     # button.fill(green)
     # button_rect = button.get_rect(center=(200, 400))
@@ -100,6 +103,17 @@ def game_intro():
                 # Was it the Escape key? If so, stop the loop.
                 if (event.key == K_RETURN) or (event.key == K_SPACE):
                     intro = False
+            elif event.type == pygame.VIDEORESIZE:
+                # There's some code to add back window content here.
+                old_surface_saved = screen
+                SCREEN_HEIGHT = event.h
+                SCREEN_WIDTH = event.w
+                screen = pygame.display.set_mode((event.w, event.h),
+                                                  pygame.RESIZABLE)
+                # On the next line, if only part of the window
+                # needs to be copied, there's some other options.
+                screen.blit(old_surface_saved, (0, 0))
+                del old_surface_saved
 
         screen.fill((255,255,255))
         largeText = pygame.font.Font('freesansbold.ttf', 80)
@@ -127,13 +141,16 @@ def game_intro():
 # Press the green button in the gutter to run the script.
 def game_loop():
     global enemy_count
+    global screen
+    global SCREEN_HEIGHT
+    global SCREEN_WIDTH
     ENEMY_RATE = pygame.USEREVENT + 3
     pygame.time.set_timer(ENEMY_RATE, 5000)
     ADDCLOUD = pygame.USEREVENT + 2
-    pygame.time.set_timer(ADDCLOUD, 600)
+    pygame.time.set_timer(ADDCLOUD, int(600/SPEED_MODIFIER))
     ADDENEMY = pygame.USEREVENT + 1
     enemy_rate = 250
-    pygame.time.set_timer(ADDENEMY, enemy_rate)
+    pygame.time.set_timer(ADDENEMY, int(enemy_rate/SPEED_MODIFIER))
 
     player = Player()
 
@@ -171,21 +188,32 @@ def game_loop():
                 all_sprites.add(new_cloud)
             elif event.type == ENEMY_RATE:
                 # Create the new cloud and add it to sprite groups
-                pygame.time.set_timer(ADDENEMY, enemy_rate)
+                pygame.time.set_timer(ADDENEMY, int(enemy_rate/SPEED_MODIFIER))
+            elif event.type == pygame.VIDEORESIZE:
+                # There's some code to add back window content here.
+                old_surface_saved = screen
+                SCREEN_HEIGHT = event.h
+                SCREEN_WIDTH = event.w
+                screen = pygame.display.set_mode((event.w, event.h),
+                                                  pygame.RESIZABLE)
+                # On the next line, if only part of the window
+                # needs to be copied, there's some other options.
+                screen.blit(old_surface_saved, (0, 0))
+                del old_surface_saved
 
-        if enemy_count == 50:
+        if enemy_count < 50:
             enemy_rate = 200
-            background_color = blue
-        elif enemy_count == 100:
+            background_color = sky_blue
+        elif enemy_count < 100:
             enemy_rate = 150
             background_color = green
-        elif enemy_count == 150:
+        elif enemy_count < 150:
             enemy_rate = 100
             background_color = red
-        elif enemy_count == 200:
+        elif enemy_count < 200:
             enemy_rate = 50
             background_color = black
-        elif enemy_count == 250:
+        elif enemy_count < 250:
             enemy_rate = 25
             background_color = white
 
@@ -268,9 +296,11 @@ pygame.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+SPEED_MODIFIER = 1
+
 # Create the screen object
 # The size is determined by the constant SCREEN_WIDTH and SCREEN_HEIGHT
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
 
 
 
