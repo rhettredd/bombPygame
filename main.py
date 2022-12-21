@@ -1,6 +1,7 @@
 
 import pygame
 import random
+import math
 
 class Cloud(pygame.sprite.Sprite):
     def __init__(self):
@@ -201,21 +202,25 @@ def game_loop():
                 screen.blit(old_surface_saved, (0, 0))
                 del old_surface_saved
 
-        if enemy_count < 50:
-            enemy_rate = 100
-            background_color = sky_blue
-        elif enemy_count < 100:
-            enemy_rate = 75
-            background_color = (30,129,176)
-        elif enemy_count < 150:
-            enemy_rate = 50
-            background_color = (0, 153, 51)
-        elif enemy_count < 200:
-            enemy_rate = 25
-            background_color = (153, 0, 0)
-        elif enemy_count < 250:
-            enemy_rate = 12
-            background_color = (153, 0, 153)
+        enemy_rate = 200/(.01*enemy_count+1)
+        background_color = (math.floor(math.floor(enemy_count/255)),math.floor(enemy_count/255),enemy_count%255)
+
+
+        # if enemy_count < 50:
+        #     enemy_rate = 100
+        #     background_color = sky_blue
+        # elif enemy_count < 100:
+        #     enemy_rate = 75
+        #     background_color = (30,129,176)
+        # elif enemy_count < 150:
+        #     enemy_rate = 50
+        #     background_color = (0, 153, 51)
+        # elif enemy_count < 200:
+        #     enemy_rate = 25
+        #     background_color = (153, 0, 0)
+        # elif enemy_count < 250:
+        #     enemy_rate = 12
+        #     background_color = (153, 0, 153)
 
 
 
