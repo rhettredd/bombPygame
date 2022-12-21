@@ -35,12 +35,12 @@ class Enemy(pygame.sprite.Sprite):
                 random.randint(0, SCREEN_HEIGHT),
             )
         )
-        self.speed = random.randint(5, 20)*SPEED_MODIFIER
+        self.speed = random.randint(5, 20)*SPEED_MODIFIER*(SCREEN_WIDTH/800)
 
     # Move the sprite based on speed
     # Remove the sprite when it passes the left edge of the screen
     def update(self):
-        self.rect.move_ip(-self.speed*(SCREEN_WIDTH/800)*SPEED_MODIFIER, 0)
+        self.rect.move_ip(-self.speed, 0)
         if self.rect.right < 0:
             self.kill()
             global enemy_count
@@ -145,11 +145,11 @@ def game_loop():
     global SCREEN_HEIGHT
     global SCREEN_WIDTH
     ENEMY_RATE = pygame.USEREVENT + 3
-    pygame.time.set_timer(ENEMY_RATE, 5000)
+    pygame.time.set_timer(ENEMY_RATE, 2500)
     ADDCLOUD = pygame.USEREVENT + 2
-    pygame.time.set_timer(ADDCLOUD, int(600/SPEED_MODIFIER))
+    pygame.time.set_timer(ADDCLOUD, int(300/SPEED_MODIFIER))
     ADDENEMY = pygame.USEREVENT + 1
-    enemy_rate = 250
+    enemy_rate = 125
     pygame.time.set_timer(ADDENEMY, int(enemy_rate/SPEED_MODIFIER))
 
     player = Player()
@@ -202,20 +202,20 @@ def game_loop():
                 del old_surface_saved
 
         if enemy_count < 50:
-            enemy_rate = 200
+            enemy_rate = 100
             background_color = sky_blue
         elif enemy_count < 100:
-            enemy_rate = 150
-            background_color = green
+            enemy_rate = 75
+            background_color = (30,129,176)
         elif enemy_count < 150:
-            enemy_rate = 100
-            background_color = red
-        elif enemy_count < 200:
             enemy_rate = 50
-            background_color = black
-        elif enemy_count < 250:
+            background_color = (0, 153, 51)
+        elif enemy_count < 200:
             enemy_rate = 25
-            background_color = white
+            background_color = (153, 0, 0)
+        elif enemy_count < 250:
+            enemy_rate = 12
+            background_color = (153, 0, 153)
 
 
 
@@ -263,7 +263,7 @@ def game_loop():
         # screen.blit(counting_text, counting_rect)
 
         pygame.display.flip()
-        clock.tick(30)
+        clock.tick(60)
 
 
 from pygame.locals import (
@@ -296,7 +296,7 @@ pygame.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-SPEED_MODIFIER = 1
+SPEED_MODIFIER = .4
 
 # Create the screen object
 # The size is determined by the constant SCREEN_WIDTH and SCREEN_HEIGHT
